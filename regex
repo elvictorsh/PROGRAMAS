@@ -1,0 +1,52 @@
+regex
+
+PATTERNS = {
+    "Número de teléfono": r"\b\d{10}\b",
+    "CURP": r"\b[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d\b",
+    "Contraseña": r"\b[a-zA-Z0-9@#$%^&+=]{8,}\b",
+    "URL": r"https?://[^\s]+",
+    "Tarjeta de crédito": r"\b(?:\d{4}[- ]?){3}\d{4}\b"
+}
+
+def buscar_en_archivo(ruta_archivo):
+    """Lee un archivo y busca patrones en su contenido."""
+    try:
+        with open(ruta_archivo, "r", encoding="utf-8") as file:
+            contenido = file.read()
+        
+        resultados = {}
+        for nombre, patron in PATTERNS.items():
+            coincidencias = re.findall(patron, contenido)
+            if coincidencias:
+                resultados[nombre] = coincidencias
+        
+        return resultados if resultados else None
+    except Exception as e:
+        print(f"Error al leer {ruta_archivo}: {e}")
+        return None
+
+def buscar_en_carpeta(carpeta):
+    """Busca los patrones en todos los archivos de la carpeta."""
+    if not os.path.isdir(carpeta):
+        print(f"La carpeta '{carpeta}' no existe.")
+        return
+
+    archivos = [f for f in os.listdir(carpeta) if f.endswith(".txt")]
+    
+    if len(archivos) < 3:
+        print("Deben haber al menos 3 archivos de texto en la carpeta.")
+        return
+
+    for archivo in archivos:
+        ruta = os.path.join(carpeta, archivo)
+        print(f"\nAnalizando archivo: {archivo}")
+        resultados = buscar_en_archivo(ruta)
+        if resultados:
+            for clave, valores in resultados.items():
+                print(f"  {clave}: {valores}")
+        else:
+            print("  No se encontraron coincidencias.")
+
+  
+carpeta_archivos = "archivos_texto"
+buscar_en_carpeta(carpeta_archivos)

@@ -1,0 +1,48 @@
+def main():
+    n, t = map(int, input().split())
+    final_state = input().strip()
+    interactions = []
+    for _ in range(t):
+        a, b, time = map(int, input().split())
+        interactions.append((time, a - 1, b - 1))
+
+    interactions.sort()
+
+    candidates = []
+    min_k = float('inf')
+    max_k = -1
+
+    for patient_zero in range(n):
+        for k in range(251):
+            infection = [False] * n
+            counter = [0] * n
+
+            infection[patient_zero] = True
+
+            for time, a, b in interactions:
+                if infection[a] and counter[a] < k:
+                    infection[b] = True
+                    counter[a] += 1
+                if infection[b] and counter[b] < k:
+                    infection[a] = True
+                    counter[b] += 1
+
+            consistent = True
+            for i in range(n):
+                if (infection[i] and final_state[i] == '0') or (not infection[i] and final_state[i] == '1'):
+                    consistent = False
+                    break
+
+            if consistent:
+                if patient_zero not in candidates:
+                    candidates.append(patient_zero)
+                min_k = min(min_k, k)
+                if k == 250:
+                    max_k = "Infinity"
+                elif max_k != "Infinity":
+                    max_k = max(max_k, k)
+
+    print(len(candidates), min_k, max_k)
+
+if __name__ == "__main__":
+    main()
